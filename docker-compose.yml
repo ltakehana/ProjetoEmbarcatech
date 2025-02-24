@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_USER: seu_usuario
+      POSTGRES_PASSWORD: sua_senha
+      POSTGRES_DB: seu_banco
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  fastapi:
+    build: ./fastapi
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://seu_usuario:sua_senha@postgres:5432/seu_banco
+
+    depends_on:
+      - postgres
+
+  reactjs:
+    build: ./reactjs
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - fastapi
+
+volumes:
+  pgdata:
